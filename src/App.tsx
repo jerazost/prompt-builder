@@ -3,12 +3,12 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import { useState } from "react";
 import { PromptPartial } from "./components/PromptPartial";
-import { DragContainer, DraggableItem } from "./components/DragContainer";
 import update from "immutability-helper";
 import { v4 as uuidv4 } from "uuid";
 import { Box } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CopyIcon from "@mui/icons-material/FileCopy";
+import { useCopyToClipboard } from "./hooks/useCopyToClipBoard";
 
 const testValues = [
   {
@@ -35,6 +35,7 @@ interface IPromptPartial {
 }
 
 function App() {
+  const [copyValue, copy] = useCopyToClipboard();
   const [promptObjects, setPromptObjects] =
     useState<IPromptPartial[]>(testValues);
   const [permutations, setPermutations] = useState<string[]>([]);
@@ -86,7 +87,7 @@ function App() {
     if (!itemSearchResult) {
       return;
     }
-    const { item, index } = itemSearchResult;
+    const { index } = itemSearchResult;
     const newPrompts = update(promptObjects, {
       [index]: {
         promptTexts: {
@@ -122,57 +123,57 @@ function App() {
     });
     setPromptObjects([...newPrompts]);
   };
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
+
   return (
-    <div className="App">
-      <Typography variant="h3" component="h1" gutterBottom>
-        Prompt Builder
-      </Typography>
-      <div className="Toolbar">
-        <Button onClick={addPrompt}>Add Prompt</Button>
-        <Button onClick={createPermutations}>Create Permutations</Button>
-      </div>
-      <Box className="Workspace">
-        <DragContainer onMoveItem={moveItem} findItem={findItem}>
+    <Box className="App">
+      <Box sx={{ display: "flex", justifyContent: "flex-start", p: 2 }}>
+        <Typography variant="h3" component="h1" gutterBottom>
+          Prompt Builder
+        </Typography>
+        <div className="Toolbar">
+          <Button onClick={addPrompt}>Add Prompt</Button>
+          <Button onClick={createPermutations}>Create Permutations</Button>
+        </div>
+      </Box>
+      <Box sx={{ display: "flex", gap: 2, p: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+            p: 2,
+            flexDirection: "column",
+          }}
+        >
           {promptObjects.map(({ variableName, promptTexts, id }, index) => {
             return (
-              <DraggableItem
-                id={id}
-                onMoveItem={moveItem}
-                findItem={findItem}
-                key={id}
-              >
-                <PromptPartial
-                  variableName={variableName}
-                  promptTexts={promptTexts}
-                  setVariableName={(value) => {
-                    const newPrompts = [...promptObjects];
-                    newPrompts[index].variableName = value;
-                    setPromptObjects(newPrompts);
-                  }}
-                  setPromptText={(value, i) => {
-                    const newPrompts = [...promptObjects];
-                    newPrompts[index].promptTexts[i] = value;
-                    setPromptObjects(newPrompts);
-                  }}
-                  handleDelete={() =>
-                    setPromptObjects(
-                      [...promptObjects].filter((_, i) => i !== index)
-                    )
-                  }
-                  deletePromptText={(i) => {
-                    const newPrompts = [...promptObjects];
-                    newPrompts[index].promptTexts.splice(i, 1);
-                    setPromptObjects(newPrompts);
-                  }}
-                  addPromptText={() => addPromptText(id)}
-                ></PromptPartial>
-              </DraggableItem>
+              <PromptPartial
+                variableName={variableName}
+                promptTexts={promptTexts}
+                setVariableName={(value) => {
+                  const newPrompts = [...promptObjects];
+                  newPrompts[index].variableName = value;
+                  setPromptObjects(newPrompts);
+                }}
+                setPromptText={(value, i) => {
+                  const newPrompts = [...promptObjects];
+                  newPrompts[index].promptTexts[i] = value;
+                  setPromptObjects(newPrompts);
+                }}
+                handleDelete={() =>
+                  setPromptObjects(
+                    [...promptObjects].filter((_, i) => i !== index)
+                  )
+                }
+                deletePromptText={(i) => {
+                  const newPrompts = [...promptObjects];
+                  newPrompts[index].promptTexts.splice(i, 1);
+                  setPromptObjects(newPrompts);
+                }}
+                addPromptText={() => addPromptText(id)}
+              ></PromptPartial>
             );
           })}
-        </DragContainer>
+        </Box>
         <Box>
           <Box
             sx={{
@@ -185,12 +186,15 @@ function App() {
             <Typography>
               {permutations.length === 0
                 ? ""
-                : "Permutations:" + permutations.length + "\n"}
+                : "Permutations: " + permutations.length + "\n"}
             </Typography>
-            <IconButton>
-              <CopyIcon
-                onClick={() => copyToClipboard(permutations.join("\n"))}
-              />
+            <IconButton
+              disabled={
+                !typeof navigator.clipboard || permutations.length === 0
+              }
+              onClick={() => copy(permutations.join("\n"))}
+            >
+              <CopyIcon />
             </IconButton>
           </Box>
           <pre>
@@ -203,7 +207,7 @@ function App() {
           </pre>
         </Box>
       </Box>
-    </div>
+    </Box>
   );
 }
 
