@@ -1,5 +1,10 @@
 .App {
-  text-align: center;
+  display: grid;
+  grid-template-columns:
+    "1fr"
+    "1fr 1fr"
+    "1fr 1fr";
+  gap: 1rem;
 }
 
 .App-logo {
@@ -26,6 +31,19 @@
 
 .App-link {
   color: #61dafb;
+}
+
+.Toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 1rem;
+}
+
+.Workspace {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
 }
 
 @keyframes App-logo-spin {
