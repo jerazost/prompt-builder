@@ -111,6 +111,7 @@ export const PromptPartial: FC<IPromptPartialProps> = ({
         <TextField
           label="Variable Name"
           value={variableName}
+          size="small"
           onChange={handleVariableNameChange}
           sx={{ flexGrow: 1 }}
         />
@@ -123,7 +124,7 @@ export const PromptPartial: FC<IPromptPartialProps> = ({
       </Box>
       {promptTexts.map((text: string, i: number) => (
         <Box
-          key={text + i}
+          key={i}
           sx={{
             display: "flex",
             alignItems: "center",
@@ -135,6 +136,7 @@ export const PromptPartial: FC<IPromptPartialProps> = ({
           </IconButton>
           <TextField
             sx={{ flexGrow: 1 }}
+            size="small"
             label={`Variant ${i + 1}`}
             value={text}
             onChange={(
