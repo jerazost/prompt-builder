@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/jerazost/prompt-builder/static/css/main.797a6f3e.css",
+    "main.js": "/jerazost/prompt-builder/static/js/main.848abce0.js",
+    "static/js/787.d2b8d3a1.chunk.js": "/jerazost/prompt-builder/static/js/787.d2b8d3a1.chunk.js",
+    "index.html": "/jerazost/prompt-builder/index.html",
+    "main.797a6f3e.css.map": "/jerazost/prompt-builder/static/css/main.797a6f3e.css.map",
+    "main.848abce0.js.map": "/jerazost/prompt-builder/static/js/main.848abce0.js.map",
+    "787.d2b8d3a1.chunk.js.map": "/jerazost/prompt-builder/static/js/787.d2b8d3a1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.797a6f3e.css",
+    "static/js/main.848abce0.js"
+  ]
+}
