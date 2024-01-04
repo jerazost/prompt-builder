@@ -9,6 +9,7 @@ import { Box } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CopyIcon from "@mui/icons-material/FileCopy";
 import { useCopyToClipboard } from "./hooks/useCopyToClipBoard";
+import { useLocalStorage } from "./hooks/useLocalStorage";
 
 const testValues = [
   {
@@ -36,9 +37,22 @@ interface IPromptPartial {
 
 function App() {
   const [copyValue, copy] = useCopyToClipboard();
-  const [promptObjects, setPromptObjects] =
-    useState<IPromptPartial[]>(testValues);
+  const [promptObjects, setPromptObjects] = useLocalStorage<IPromptPartial[]>(
+    "prompts",
+    testValues
+  );
   const [permutations, setPermutations] = useState<string[]>([]);
+  const shufflePermutations = () => {
+    const newPermutations = [...permutations];
+    for (let i = permutations.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [newPermutations[i], newPermutations[j]] = [
+        newPermutations[j],
+        newPermutations[i],
+      ];
+    }
+    setPermutations(newPermutations);
+  };
   const createPermutations = () => {
     const variableMap = promptObjects.reduce((acc, promptObject) => {
       return acc.set(
@@ -127,13 +141,11 @@ function App() {
   return (
     <Box className="App">
       <Box sx={{ display: "flex", justifyContent: "flex-start", p: 2 }}>
-        <Typography variant="h3" component="h1" gutterBottom>
-          Prompt Builder
-        </Typography>
-        <div className="Toolbar">
+        <Box className="Toolbar">
           <Button onClick={addPrompt}>Add Prompt</Button>
           <Button onClick={createPermutations}>Create Permutations</Button>
-        </div>
+          <Button onClick={shufflePermutations}>Shuffle Permutations</Button>
+        </Box>
       </Box>
       <Box sx={{ display: "flex", gap: 2, p: 2 }}>
         <Box
@@ -169,16 +181,25 @@ function App() {
                   newPrompts[index].promptTexts.splice(i, 1);
                   setPromptObjects(newPrompts);
                 }}
+                handleMoveItem={(newIndex) => {
+                  moveItem(id, newIndex);
+                }}
                 addPromptText={() => addPromptText(id)}
               ></PromptPartial>
             );
           })}
         </Box>
-        <Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            maxWidth: "70rem",
+            overflow: "auto",
+          }}
+        >
           <Box
             sx={{
               display: "flex",
-              justifyContent: "space-between",
               alignItems: "center",
               gap: "1rem",
             }}
