@@ -5,7 +5,7 @@ import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
 import ClearIcon from "@mui/icons-material/Clear";
-
+import { ArrowUpward, ArrowDownward } from "@mui/icons-material";
 /**
  * @interface IPromptPartialProps
  *
@@ -45,6 +45,7 @@ interface IPromptPartialProps {
 
   deletePromptText: (i: number) => void;
   addPromptText: () => void;
+  handleMoveItem: (newIndex: number) => void;
 }
 
 /**
@@ -71,6 +72,7 @@ export const PromptPartial: FC<IPromptPartialProps> = ({
   addPromptText,
   deletePromptText,
   handleDelete,
+  handleMoveItem,
 }) => {
   const handleVariableNameChange = (
     event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -94,10 +96,8 @@ export const PromptPartial: FC<IPromptPartialProps> = ({
       sx={{
         display: "flex",
         flexDirection: "column",
-        gap: 2,
-        p: 2,
-        border: "1px solid",
-        borderRadius: 1,
+        gap: 1,
+        minWidth: "30rem",
       }}
     >
       <Box
@@ -117,6 +117,12 @@ export const PromptPartial: FC<IPromptPartialProps> = ({
         />
         <IconButton onClick={addPromptText}>
           <AddIcon />
+        </IconButton>
+        <IconButton onClick={() => handleMoveItem(0)}>
+          <ArrowUpward />
+        </IconButton>
+        <IconButton onClick={() => handleMoveItem(1)}>
+          <ArrowDownward />
         </IconButton>
         <IconButton onClick={handleDelete}>
           <DeleteIcon />
