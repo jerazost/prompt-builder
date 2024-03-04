@@ -5,7 +5,7 @@ import { useState } from "react";
 import { PromptPartial } from "./components/PromptPartial";
 import update from "immutability-helper";
 import { v4 as uuidv4 } from "uuid";
-import { Box } from "@mui/material";
+import { Box, Input } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CopyIcon from "@mui/icons-material/FileCopy";
 import { useCopyToClipboard } from "./hooks/useCopyToClipBoard";
@@ -138,6 +138,52 @@ function App() {
     setPromptObjects([...newPrompts]);
   };
 
+  const importCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const csv = e.target?.result;
+      if (typeof csv !== "string") {
+        return;
+      }
+      const rows = csv.split("\n").map((line) => {
+        const regex = /,(?=(?:(?:[^"]*"){2})*[^"]*$)/g;
+        return line.split(regex).map((cell) => cell.replaceAll('"', "").trim());
+      });
+      const headers = rows.shift();
+      if (!headers) {
+        return;
+      }
+      let newPrompts = [];
+      for (let i = 0; i < headers.length; i++) {
+        const variableName = headers[i];
+        const promptTexts = rows
+          .map((row) => row[i])
+          .filter((text) => !!text.trim());
+        newPrompts.push({
+          id: uuidv4(),
+          variableName,
+          promptTexts,
+        });
+      }
+      setPromptObjects(newPrompts);
+    };
+    reader.readAsText(file);
+  };
+  const exportCSV = () => {
+    const csv = promptObjects.reduce((acc, { variableName, promptTexts }) => {
+      return `${acc}${variableName},${promptTexts.join(",")}\n`;
+    }, "");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "prompts.csv";
+    a.click();
+  };
   return (
     <Box className="App">
       <Box sx={{ display: "flex", justifyContent: "flex-start", p: 2 }}>
@@ -145,6 +191,12 @@ function App() {
           <Button onClick={addPrompt}>Add Prompt</Button>
           <Button onClick={createPermutations}>Create Permutations</Button>
           <Button onClick={shufflePermutations}>Shuffle Permutations</Button>
+          <Input
+            type="file"
+            inputProps={{ accept: ".csv" }}
+            onChange={importCSV}
+          />
+          <Button onClick={exportCSV}>Export CSV</Button>
         </Box>
       </Box>
       <Box sx={{ display: "flex", gap: 2, p: 2 }}>
@@ -152,7 +204,6 @@ function App() {
           sx={{
             display: "flex",
             gap: 1,
-            p: 2,
             flexDirection: "column",
           }}
         >
